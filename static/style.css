@@ -1,0 +1,134 @@
+/* 🔥 Background */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    margin: 0;
+    color: white;
+}
+
+/* 🔥 Container */
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+/* 🔥 Title */
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+/* 🔥 Top bar */
+.top-bar {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 🔥 Buttons */
+button {
+    padding: 12px 20px;
+    margin: 8px;
+    border: none;
+    border-radius: 12px;
+    background: white;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+button:hover {
+    transform: translateY(-2px) scale(1.05);
+    background: #f1f1f1;
+}
+
+/* 🔥 Special buttons */
+button:nth-child(1) {
+    background: #00ffcc;
+}
+
+button:nth-child(2) {
+    background: #ff6b6b;
+    color: white;
+}
+
+/* 🔥 Cards */
+.card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 18px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* 🔥 Output */
+.output-box p {
+    margin: 6px 0;
+}
+
+/* 🔥 Status */
+#status {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* 🔥 Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+    color: black;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+th {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 14px;
+    font-size: 15px;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+    background: #f9f9f9;
+}
+
+/* 🔥 Links */
+a {
+    text-decoration: none;
+}
+
+/* 🔥 Dashboard charts */
+canvas {
+    background: white;
+    border-radius: 12px;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+/* 🔥 Responsive */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+
+    button {
+        width: 100%;
+    }
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Time Logger</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🎤 Voice Time Logger</h1>
+
+    <!-- 🔝 Top Navigation -->
+    <div class="top-bar">
+        <a href="/dashboard">
+            <button>📊 View Dashboard</button>
+        </a>
+    </div>
+
+    <!-- 🎤 Recording Controls -->
+    <div class="card">
+        <h3>🎙 Record Your Work</h3>
+        <button onclick="startRecording()">Start Recording</button>
+        <button onclick="stopRecording()">Stop</button>
+        <p id="status">Status: Idle</p>
+    </div>
+
+    <!-- 🧠 Output Section -->
+    <div class="card output-box">
+        <h3>🧠 Recognized Output</h3>
+        <p><b>Text:</b> <span id="recognizedText">-</span></p>
+        <p><b>Project:</b> <span id="project">-</span></p>
+        <p><b>Time Spent:</b> <span id="timeSpent">-</span></p>
+    </div>
+
+    <!-- 📊 Logs Table -->
+    <div class="card">
+        <h2>📊 Logs</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Task</th>
+                    <th>Project</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="logsTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+
+// 🎤 Start Recording
+async function startRecording() {
+    document.getElementById("status").innerText = "🎙 Recording...";
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);
+    };
+
+    mediaRecorder.start();
+}
+
+// 🛑 Stop Recording
+function stopRecording() {
+    mediaRecorder.stop();
+
+    mediaRecorder.onstop = async () => {
+        document.getElementById("status").innerText = "⏳ Processing...";
+
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        audioChunks = [];
+
+        const formData = new FormData();
+        formData.append("file", blob, "recording.webm");
+
+        try {
+            const response = await fetch("/log-voice", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            document.getElementById("recognizedText").innerText =
+                data.text && data.text.trim() !== "" ? data.text : "Not detected";
+
+            document.getElementById("project").innerText =
+                data.project && data.project.trim() !== "" ? data.project : "Not detected";
+
+            document.getElementById("timeSpent").innerText =
+                data.time_spent && data.time_spent.trim() !== "" ? data.time_spent : "Not detected";
+
+            if (data.audio) {
+                const audio = new Audio("data:audio/mp3;base64," + data.audio);
+                audio.play();
+            }
+
+            document.getElementById("status").innerText = "✅ Done";
+
+            loadLogs();
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById("status").innerText = "❌ Error";
+        }
+    };
+}
+
+// 📊 Load logs
+async function loadLogs() {
+    const response = await fetch("/logs");
+    const data = await response.json();
+
+    const table = document.getElementById("logsTable");
+    table.innerHTML = "";
+
+    data.forEach(log => {
+        table.innerHTML += `
+            <tr>
+                <td>${log.id}</td>
+                <td>${log.task}</td>
+                <td>${log.project}</td>
+                <td>${log.time_spent}</td>
+            </tr>
+        `;
+    });
+}
+
+// 🔄 Load on start
+loadLogs();
+</script>
+
+</body>
+</html>

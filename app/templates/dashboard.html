@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>📊 Dashboard</h1>
+
+    <a href="/">
+        <button>⬅ Back to Logger</button>
+    </a>
+
+    <!-- 🔥 STATS -->
+    <div class="card">
+        <h2>📌 Overview</h2>
+        <p>Total Logs: <span id="totalLogs">0</span></p>
+        <p>Total Projects: <span id="totalProjects">0</span></p>
+    </div>
+
+    <!-- 📊 Charts -->
+    <div class="card">
+        <h3>📊 Logs per Project</h3>
+        <canvas id="projectChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>⏱ Time Distribution</h3>
+        <canvas id="timeChart"></canvas>
+    </div>
+
+</div>
+
+<script>
+let projectChart, timeChart;
+
+async function loadDashboard() {
+    try {
+        const res = await fetch("/dashboard-data");
+        const data = await res.json();
+
+        const projects = Object.keys(data.project_counts);
+        const counts = Object.values(data.project_counts);
+
+        const timeProjects = Object.keys(data.project_time);
+        const times = Object.values(data.project_time);
+
+        // 🔥 Update stats
+        document.getElementById("totalLogs").innerText = data.total_logs;
+        document.getElementById("totalProjects").innerText = projects.length;
+
+        // 🔥 Destroy old charts
+        if (projectChart) projectChart.destroy();
+        if (timeChart) timeChart.destroy();
+
+        // 📊 Bar Chart
+        projectChart = new Chart(document.getElementById("projectChart"), {
+            type: "bar",
+            data: {
+                labels: projects,
+                datasets: [{
+                    label: "Logs per Project",
+                    data: counts
+                }]
+            }
+        });
+
+        // 🥧 Pie Chart
+        timeChart = new Chart(document.getElementById("timeChart"), {
+            type: "pie",
+            data: {
+                labels: timeProjects,
+                datasets: [{
+                    label: "Time Spent",
+                    data: times
+                }]
+            }
+        });
+
+    } catch (error) {
+        console.error("Dashboard error:", error);
+    }
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>
