@@ -15,7 +15,7 @@
         <button>⬅ Back to Logger</button>
     </a>
 
-    <!-- 🔥 STATS -->
+    <!--  STATS -->
     <div class="card">
         <h2>📌 Overview</h2>
         <p>Total Logs: <span id="totalLogs">0</span></p>
@@ -49,11 +49,11 @@ async function loadDashboard() {
         const timeProjects = Object.keys(data.project_time);
         const times = Object.values(data.project_time);
 
-        // 🔥 Update stats
+        //  Update stats
         document.getElementById("totalLogs").innerText = data.total_logs;
         document.getElementById("totalProjects").innerText = projects.length;
 
-        // 🔥 Destroy old charts
+        //  Destroy old charts
         if (projectChart) projectChart.destroy();
         if (timeChart) timeChart.destroy();
 
@@ -69,7 +69,7 @@ async function loadDashboard() {
             }
         });
 
-        // 🥧 Pie Chart
+        //  Pie Chart
         timeChart = new Chart(document.getElementById("timeChart"), {
             type: "pie",
             data: {
