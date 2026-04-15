@@ -2,12 +2,12 @@ let mediaRecorder;
 let audioChunks = [];
 let currentAudio = null;
 
-// 🎤 Start Recording
+// Start Recording
 async function startRecording() {
     try {
         document.getElementById("status").innerText = "🎙 Recording...";
 
-        // 🔥 Disable button while recording
+        // Disable button while recording
         document.querySelector("button[onclick='startRecording()']").disabled = true;
 
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -36,7 +36,7 @@ async function startRecording() {
 
                 const data = await response.json();
 
-                // ✅ Update UI safely
+                // Update UI safely
                 document.getElementById("recognizedText").innerText =
                     data.text && data.text.trim() !== "" ? data.text : "Not detected";
 
@@ -46,12 +46,12 @@ async function startRecording() {
                 document.getElementById("timeSpent").innerText =
                     data.time_spent && data.time_spent.trim() !== "" ? data.time_spent : "Not detected";
 
-                // 🔊 Stop previous audio
+                // Stop previous audio
                 if (currentAudio) {
                     currentAudio.pause();
                 }
 
-                // 🔊 Play new audio
+                // Play new audio
                 if (data.audio) {
                     currentAudio = new Audio("data:audio/mp3;base64," + data.audio);
                     currentAudio.play();
@@ -87,7 +87,7 @@ function stopRecording() {
 }
 
 
-// 📊 Load logs
+// Load logs
 async function loadLogs() {
     try {
         const res = await fetch("/logs");
@@ -113,5 +113,5 @@ async function loadLogs() {
 }
 
 
-// 🔄 Load logs on start
+// Load logs on start
 loadLogs();
