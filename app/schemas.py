@@ -1,23 +1,29 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 
 
-# Base schema (shared fields)
+# ==============================
+#  Base Schema
+# ==============================
 class TimeLogBase(BaseModel):
-    task: str
-    project: str
-    time_spent: str
+    task: str = Field(..., example="Developed API endpoints")
+    project: str = Field(..., example="AI Logger")
+    time_spent: str = Field(..., example="2 hours")
 
 
-# Create schema (input)
+# ==============================
+#  Create Schema (Input)
+# ==============================
 class TimeLogCreate(TimeLogBase):
     pass
 
 
-# Response schema (output)
+# ==============================
+#  Response Schema (Output)
+# ==============================
 class TimeLogResponse(TimeLogBase):
     id: int
-    created_at: datetime   # 🔥 added (important)
+    created_at: datetime
 
     class Config:
-        from_attributes = True  # SQLAlchemy compatibility
+        from_attributes = True
