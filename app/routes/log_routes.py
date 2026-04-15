@@ -17,7 +17,7 @@ from gtts import gTTS
 router = APIRouter()
 
 
-# ✅ DB Dependency
+#  DB Dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -26,21 +26,21 @@ def get_db():
         db.close()
 
 
-# ✅ DASHBOARD API
+# DASHBOARD API
 @router.get("/dashboard-data")
 def dashboard(db: Session = Depends(get_db)):
     logs = db.query(TimeLog).all()
 
     total_logs = len(logs)
 
-    # 🔥 Logs per project
+    # Logs per project
     project_counts = (
         db.query(TimeLog.project, func.count(TimeLog.id))
         .group_by(TimeLog.project)
         .all()
     )
 
-    # 🔥 Time aggregation (hours + minutes support)
+    # Time aggregation (hours + minutes support)
     project_time = {}
 
     for log in logs:
@@ -66,7 +66,7 @@ def dashboard(db: Session = Depends(get_db)):
     }
 
 
-# ✅ VOICE LOG API
+# VOICE LOG API
 @router.post("/log-voice")
 async def log_voice(file: UploadFile = File(...), db: Session = Depends(get_db)):
     file_path = None
@@ -77,11 +77,11 @@ async def log_voice(file: UploadFile = File(...), db: Session = Depends(get_db))
         file_path = f"temp_{unique_id}.webm"
         audio_path = f"response_{unique_id}.mp3"
 
-        # ✅ Save uploaded file
+        #  Save uploaded file
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        # ✅ Speech to text
+        # Speech to text
         text = speech_to_text(file_path)
 
         if not text or text.strip() == "":
@@ -89,20 +89,20 @@ async def log_voice(file: UploadFile = File(...), db: Session = Depends(get_db))
 
         print("🎤 Recognized:", text)
 
-        # ✅ Parse text
+        #  Parse text
         parsed = parse_text(text)
 
-        # ✅ Save to DB
+        # Save to DB
         log = TimeLog(**parsed)
         db.add(log)
         db.commit()
         db.refresh(log)
 
-        # 🔊 Generate audio response
+        #  Generate audio response
         tts = gTTS(text=text, lang='en')
         tts.save(audio_path)
 
-        # 🔊 Convert audio → base64
+        #  Convert audio → base64
         with open(audio_path, "rb") as f:
             audio_base64 = base64.b64encode(f.read()).decode("utf-8")
 
@@ -119,7 +119,7 @@ async def log_voice(file: UploadFile = File(...), db: Session = Depends(get_db))
         raise HTTPException(status_code=500, detail="Voice processing failed")
 
     finally:
-        # 🔥 Safe cleanup (no crash if file missing)
+        #  Safe cleanup (no crash if file missing)
         if file_path and os.path.exists(file_path):
             os.remove(file_path)
 
@@ -127,7 +127,7 @@ async def log_voice(file: UploadFile = File(...), db: Session = Depends(get_db))
             os.remove(audio_path)
 
 
-# ✅ GET ALL LOGS
+#  GET ALL LOGS
 @router.get("/logs", response_model=list[TimeLogResponse])
 def get_logs(db: Session = Depends(get_db)):
     return db.query(TimeLog).all()
