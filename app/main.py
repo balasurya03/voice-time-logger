@@ -8,7 +8,7 @@ from app.routes import log_routes
 from app.database import init_db
 
 
-# 🔥 Create FastAPI app
+# Create FastAPI app
 app = FastAPI(
     title="Voice Time Logging Assistant",
     description="AI-powered voice logging with analytics dashboard",
@@ -16,7 +16,7 @@ app = FastAPI(
 )
 
 
-# 🔥 CORS (only once)
+# CORS (only once)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # change later for production
@@ -26,29 +26,29 @@ app.add_middleware(
 )
 
 
-# 🔥 Initialize DB
+# Initialize DB
 init_db()
 
 
-# 🔥 Static files
+# Static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-# 🔥 Templates
+# Templates
 templates = Jinja2Templates(directory="app/templates")
 
 
-# 🔥 API routes
+# API routes
 app.include_router(log_routes.router)
 
 
-# 🏠 Home page
+# Home page
 @app.get("/")
 def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-# 📊 Dashboard page
+# Dashboard page
 @app.get("/dashboard")
 def dashboard_page(request: Request):
     return templates.TemplateResponse("dashboard.html", {"request": request})
