@@ -8,14 +8,22 @@ class TimeLog(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    # Task description
-    task = Column(String, nullable=False)
+    #  Task description
+    task = Column(String(255), nullable=False)
 
-    # Project name
-    project = Column(String, nullable=False, index=True)
+    #  Project name
+    project = Column(String(100), nullable=False, index=True)
 
-    # Time spent (stored as string for now)
-    time_spent = Column(String, nullable=False)
+    #  Time spent (e.g., "2 hours", "30 mins")
+    time_spent = Column(String(50), nullable=False)
 
-    # NEW: timestamp (very important)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    #  Created timestamp
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+        index=True
+    )
+
+    def __repr__(self) -> str:
+        return f"<TimeLog(task='{self.task}', project='{self.project}', time='{self.time_spent}')>"
