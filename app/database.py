@@ -1,28 +1,42 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+import os
 
-# SQLite Database URL
-DATABASE_URL = "sqlite:///./timelogs.db"
+# ==============================
+#  DATABASE CONFIG
+# ==============================
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./timelogs.db")
 
-#  Create Engine
+
+# ==============================
+# ENGINE
+# ==============================
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False}  # needed for SQLite
+    connect_args={"check_same_thread": False},  # needed for SQLite
+    pool_pre_ping=True  # ✅ checks DB connection health
 )
 
-# Session Factory
+
+# ==============================
+#  SESSION FACTORY
+# ==============================
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
     bind=engine
 )
 
-# Base class for models
+
+# ==============================
+# BASE MODEL
+# ==============================
 Base = declarative_base()
 
 
-#  OPTIONAL (but recommended)
-# Call this once when app starts to create tables automatically
-def init_db():
-    from app import models  # import all models here
+# ==============================
+# INIT DB
+# ==============================
+def init_db() -> None:
+    from app import models  # ensure models are loaded
     Base.metadata.create_all(bind=engine)
