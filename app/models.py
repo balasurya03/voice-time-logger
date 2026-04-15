@@ -8,14 +8,14 @@ class TimeLog(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    # 🔹 Task description
+    # Task description
     task = Column(String, nullable=False)
 
-    # 🔹 Project name
+    # Project name
     project = Column(String, nullable=False, index=True)
 
-    # 🔹 Time spent (stored as string for now)
+    # Time spent (stored as string for now)
     time_spent = Column(String, nullable=False)
 
-    # 🔥 NEW: timestamp (very important)
+    # NEW: timestamp (very important)
     created_at = Column(DateTime, default=datetime.utcnow)
