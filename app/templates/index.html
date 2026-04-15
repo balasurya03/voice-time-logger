@@ -17,7 +17,7 @@
         </a>
     </div>
 
-    <!-- 🎤 Recording Controls -->
+    <!--  Recording Controls -->
     <div class="card">
         <h3>🎙 Record Your Work</h3>
         <button onclick="startRecording()">Start Recording</button>
@@ -25,7 +25,7 @@
         <p id="status">Status: Idle</p>
     </div>
 
-    <!-- 🧠 Output Section -->
+    <!--  Output Section -->
     <div class="card output-box">
         <h3>🧠 Recognized Output</h3>
         <p><b>Text:</b> <span id="recognizedText">-</span></p>
@@ -33,7 +33,7 @@
         <p><b>Time Spent:</b> <span id="timeSpent">-</span></p>
     </div>
 
-    <!-- 📊 Logs Table -->
+    <!-- Logs Table -->
     <div class="card">
         <h2>📊 Logs</h2>
         <table>
@@ -55,7 +55,7 @@
 let mediaRecorder;
 let audioChunks = [];
 
-// 🎤 Start Recording
+//  Start Recording
 async function startRecording() {
     document.getElementById("status").innerText = "🎙 Recording...";
 
@@ -137,7 +137,7 @@ async function loadLogs() {
     });
 }
 
-// 🔄 Load on start
+//  Load on start
 loadLogs();
 </script>
 
