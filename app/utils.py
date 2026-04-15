@@ -4,11 +4,11 @@ from pydub import AudioSegment
 import whisper
 import speech_recognition as sr
 
-# 🔥 Load Whisper model once
+# Load Whisper model once
 model = whisper.load_model("base")
 
 
-# 🔊 Convert any audio → WAV
+# Convert any audio → WAV
 def convert_to_wav(input_path, output_path):
     try:
         audio = AudioSegment.from_file(input_path)
@@ -18,12 +18,12 @@ def convert_to_wav(input_path, output_path):
         raise e
 
 
-# 🧠 Speech to Text (Whisper + fallback)
+# Speech to Text (Whisper + fallback)
 def speech_to_text(file_path):
     try:
         result = model.transcribe(
             file_path,
-            language="en"   # 🔥 FORCE ENGLISH
+            language="en"   #  FORCE ENGLISH
         )
 
         text = result["text"]
@@ -36,11 +36,11 @@ def speech_to_text(file_path):
         return "Could not understand audio"
 
 
-# 🧠 Parse extracted text
+# Parse extracted text
 def parse_text(text):
     text_lower = text.lower()
 
-    # 🔥 Improved regex (hours + minutes)
+    # Improved regex (hours + minutes)
     time_match = re.search(r'(\d+)\s*(hour|hours|hr|hrs|minute|minutes|min)', text_lower)
     time_spent = time_match.group() if time_match else "Not specified"
 
