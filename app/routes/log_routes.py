@@ -11,13 +11,15 @@ import re
 from app.database import SessionLocal
 from app.models import TimeLog
 from app.schemas import TimeLogResponse
-from app.utils import speech_to_text, parse_text
+from app.utils import speech_to_text, app_graph   
 from gtts import gTTS
 
 router = APIRouter()
 
 
-#  DB Dependency
+# ==============================
+# DB Dependency
+# ==============================
 def get_db():
     db = SessionLocal()
     try:
@@ -26,21 +28,19 @@ def get_db():
         db.close()
 
 
+# ==============================
 # DASHBOARD API
+# ==============================
 @router.get("/dashboard-data")
 def dashboard(db: Session = Depends(get_db)):
     logs = db.query(TimeLog).all()
 
-    total_logs = len(logs)
-
-    # Logs per project
     project_counts = (
         db.query(TimeLog.project, func.count(TimeLog.id))
         .group_by(TimeLog.project)
         .all()
     )
 
-    # Time aggregation (hours + minutes support)
     project_time = {}
 
     for log in logs:
@@ -50,59 +50,59 @@ def dashboard(db: Session = Depends(get_db)):
         minutes = re.search(r'(\d+)\s*(minute|min)', time)
 
         total_time = 0
-
         if hours:
             total_time += int(hours.group(1))
-
         if minutes:
             total_time += int(minutes.group(1)) / 60
 
         project_time[log.project] = project_time.get(log.project, 0) + total_time
 
     return {
-        "total_logs": total_logs,
+        "total_logs": len(logs),
         "project_counts": dict(project_counts),
         "project_time": project_time
     }
 
 
+# ==============================
 # VOICE LOG API
+# ==============================
 @router.post("/log-voice")
 async def log_voice(file: UploadFile = File(...), db: Session = Depends(get_db)):
     file_path = None
     audio_path = None
 
     try:
+        #  Step 1: Save file
         unique_id = str(uuid.uuid4())
         file_path = f"temp_{unique_id}.webm"
         audio_path = f"response_{unique_id}.mp3"
 
-        #  Save uploaded file
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        # Speech to text
+        # Step 2: Speech → Text
         text = speech_to_text(file_path)
 
-        if not text or text.strip() == "":
+        if not text.strip():
             text = "Could not understand audio"
 
         print("🎤 Recognized:", text)
 
-        #  Parse text
-        parsed = parse_text(text)
+        # Step 3: LangGraph Agent (REPLACED parse_text 🔥)
+        result = app_graph.invoke({"text": text})
+        parsed = result["parsed"]
 
-        # Save to DB
+        # Step 4: Save to DB
         log = TimeLog(**parsed)
         db.add(log)
         db.commit()
         db.refresh(log)
 
-        #  Generate audio response
-        tts = gTTS(text=text, lang='en')
+        # Step 5: Generate audio
+        tts = gTTS(text=text, lang="en")
         tts.save(audio_path)
 
-        #  Convert audio → base64
         with open(audio_path, "rb") as f:
             audio_base64 = base64.b64encode(f.read()).decode("utf-8")
 
@@ -115,11 +115,13 @@ async def log_voice(file: UploadFile = File(...), db: Session = Depends(get_db))
         })
 
     except Exception as e:
-        print("❌ ERROR:", str(e))
-        raise HTTPException(status_code=500, detail="Voice processing failed")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Voice processing failed: {str(e)}"
+        )
 
     finally:
-        #  Safe cleanup (no crash if file missing)
+        #  Cleanup
         if file_path and os.path.exists(file_path):
             os.remove(file_path)
 
@@ -127,7 +129,9 @@ async def log_voice(file: UploadFile = File(...), db: Session = Depends(get_db))
             os.remove(audio_path)
 
 
-#  GET ALL LOGS
+# ==============================
+# GET ALL LOGS
+# ==============================
 @router.get("/logs", response_model=list[TimeLogResponse])
 def get_logs(db: Session = Depends(get_db)):
     return db.query(TimeLog).all()
